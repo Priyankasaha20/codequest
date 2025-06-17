@@ -83,8 +83,9 @@
   --radius: 0.5rem;
 
   /* Typography */
-  --font-sans: var(--font-geist-sans, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif);
+  --font-sans: var(--font-montserrat, var(--font-geist-sans, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif));
   --font-mono: var(--font-geist-mono, 'Fira Code', 'Monaco', 'Consolas', 'Courier New', monospace);
+  --font-montserrat: var(--font-montserrat, 'Montserrat', sans-serif);
 }
 
 * {
@@ -271,6 +272,14 @@ body {
   .shadow-large {
     box-shadow: 0 8px 24px rgba(46, 53, 50, 0.15), 0 4px 12px rgba(46, 53, 50, 0.2);
   }
+
+  /* Additional gradient utilities */
+  .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+  .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+  .from-claret-500 { --tw-gradient-from: var(--color-claret-500); --tw-gradient-to: transparent; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-claret-600 { --tw-gradient-to: var(--color-claret-600); }
+  .bg-clip-text { background-clip: text; }
+  .text-transparent { color: transparent; }
 }
 
 /* Animation Improvements */
@@ -407,3 +416,31 @@ body {
   padding: 1.5rem;
   border-top: 1px solid var(--color-alabaster-200);
 }
+
+/* Montserrat Font Utilities */
+  .font-montserrat {
+    font-family: var(--font-montserrat, 'Montserrat', sans-serif);
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+
+  .montserrat-thin { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 100; }
+  .montserrat-extralight { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 200; }
+  .montserrat-light { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 300; }
+  .montserrat-regular { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 400; }
+  .montserrat-medium { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 500; }
+  .montserrat-semibold { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 600; }
+  .montserrat-bold { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 700; }
+  .montserrat-extrabold { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 800; }
+  .montserrat-black { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 900; }
+
+  /* Italic versions */
+  .montserrat-thin-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 100; font-style: italic; }
+  .montserrat-extralight-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 200; font-style: italic; }
+  .montserrat-light-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 300; font-style: italic; }
+  .montserrat-regular-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 400; font-style: italic; }
+  .montserrat-medium-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 500; font-style: italic; }
+  .montserrat-semibold-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 600; font-style: italic; }
+  .montserrat-bold-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 700; font-style: italic; }
+  .montserrat-extrabold-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 800; font-style: italic; }
+  .montserrat-black-italic { font-family: var(--font-montserrat, 'Montserrat', sans-serif); font-weight: 900; font-style: italic; }

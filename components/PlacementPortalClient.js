@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import HomeScreen from "./screens/HomeScreen";
+import LoginScreen from "./screens/LoginScreen";
 import DashboardScreen from "./screens/DashboardScreen";
 import DailyChallengeScreen from "./screens/DailyChallengeScreen";
 import PracticeHubScreen from "./screens/PracticeHubScreen";
@@ -35,23 +36,28 @@ const PlacementPortalClient = () => {
       .toString()
       .padStart(2, "0")}`;
   };
-
   const renderCurrentScreen = () => {
-    if (!isLoggedIn && currentScreen !== "home") {
+    // Always show home screen first, regardless of login status
+    if (currentScreen === "home") {
+      return <HomeScreen setCurrentScreen={setCurrentScreen} />;
+    }
+
+    // Show login screen when user tries to access auth-required pages
+    if (!isLoggedIn && currentScreen !== "home" && currentScreen !== "login") {
       return (
-        <HomeScreen
-          setIsLoggedIn={setIsLoggedIn}
+        <LoginScreen
           setCurrentScreen={setCurrentScreen}
+          setIsLoggedIn={setIsLoggedIn}
         />
       );
     }
 
     switch (currentScreen) {
-      case "home":
+      case "login":
         return (
-          <HomeScreen
-            setIsLoggedIn={setIsLoggedIn}
+          <LoginScreen
             setCurrentScreen={setCurrentScreen}
+            setIsLoggedIn={setIsLoggedIn}
           />
         );
       case "dashboard":
@@ -84,13 +90,13 @@ const PlacementPortalClient = () => {
     }
   };
 
-  if (!isLoggedIn && currentScreen === "home") {
-    return (
-      <HomeScreen
-        setIsLoggedIn={setIsLoggedIn}
-        setCurrentScreen={setCurrentScreen}
-      />
-    );
+  // Show full-screen for home and login pages (no sidebar/header)
+  if (
+    currentScreen === "home" ||
+    currentScreen === "login" ||
+    (!isLoggedIn && currentScreen !== "home")
+  ) {
+    return renderCurrentScreen();
   }
 
   return (
