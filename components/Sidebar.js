@@ -14,9 +14,7 @@ const Sidebar = ({
       } transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:inset-0`}
     >
       <div className="flex flex-col h-full">
-        <div className="p-4 border-b border-alabaster-200">
-          <h2 className="text-lg font-semibold text-onyx-500">Navigation</h2>
-        </div>
+      
         <nav className="flex-1 p-4 space-y-2">
           {navigation.map((item) => (
             <button
