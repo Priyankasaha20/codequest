@@ -1,22 +1,28 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
-import { useAppContext } from "../../contexts/AppContext";
+import { useTimer } from "../../contexts/TimerContext";
 
 const DailyChallengeScreen = () => {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const { isLoggedIn, timer, timerActive, setTimerActive, formatTime } =
-    useAppContext();
+  const { timer, timerActive, setTimerActive, formatTime } = useTimer();
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push("/login");
-    }
-  }, [isLoggedIn, router]);
+  // While NextAuth is checking session
+  if (status === "loading") {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-claret-500"></div>
+      </div>
+    );
+  }
 
-  if (!isLoggedIn) {
-    return null; // or a loading spinner
+  // If no session, redirect to login
+  if (!session) {
+    router.push("/login");
+    return null;
   }
   return (
     <div className="p-6 max-w-4xl mx-auto">

@@ -1,18 +1,17 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-const AppContext = createContext();
+const TimerContext = createContext();
 
-export const useAppContext = () => {
-  const context = useContext(AppContext);
+export const useTimer = () => {
+  const context = useContext(TimerContext);
   if (!context) {
-    throw new Error("useAppContext must be used within an AppProvider");
+    throw new Error("useTimer must be used within a TimerProvider");
   }
   return context;
 };
 
-export const AppProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export const TimerProvider = ({ children }) => {
   const [timer, setTimer] = useState(600); // 10 minutes for daily challenge
   const [timerActive, setTimerActive] = useState(false);
 
@@ -43,8 +42,6 @@ export const AppProvider = ({ children }) => {
   };
 
   const value = {
-    isLoggedIn,
-    setIsLoggedIn,
     timer,
     setTimer,
     timerActive,
@@ -53,5 +50,7 @@ export const AppProvider = ({ children }) => {
     resetTimer,
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <TimerContext.Provider value={value}>{children}</TimerContext.Provider>
+  );
 };

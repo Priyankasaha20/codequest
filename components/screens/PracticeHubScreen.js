@@ -1,21 +1,25 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Search, Filter, CheckCircle } from "lucide-react";
-import { useAppContext } from "../../contexts/AppContext";
 
 const PracticeHubScreen = () => {
   const router = useRouter();
-  const { isLoggedIn } = useAppContext();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [isLoggedIn, router]);
+  }, [status, router]);
 
-  if (!isLoggedIn) {
-    return null; // or a loading spinner
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return null;
   }
   const problems = [
     {

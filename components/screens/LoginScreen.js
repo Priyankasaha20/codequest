@@ -1,13 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
-import { useAppContext } from "../../contexts/AppContext";
 
 const LoginScreen = () => {
   const router = useRouter();
-  const { setIsLoggedIn } = useAppContext();
+  const { data: session, status } = useSession();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,6 +17,13 @@ const LoginScreen = () => {
     name: "",
   });
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -24,26 +31,40 @@ const LoginScreen = () => {
     });
   };
 
-  const handleEmailLogin = (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
-    // Here you would integrate with your authentication service
-    setIsLoggedIn(true);
-    router.push("/dashboard");
+    const result = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
+
+    if (result?.ok) {
+      router.push("/dashboard");
+    } else {
+      alert("Invalid credentials");
+    }
   };
 
   const handleGoogleAuth = () => {
-    // Integration with Google OAuth
-    console.log("Google Auth initiated");
-    setIsLoggedIn(true);
-    router.push("/dashboard");
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const handleGitHubAuth = () => {
-    // Integration with GitHub OAuth
-    console.log("GitHub Auth initiated");
-    setIsLoggedIn(true);
-    router.push("/dashboard");
+    signIn("github", { callbackUrl: "/dashboard" });
   };
+
+  // Show loading while checking session
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-timberwolf-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-claret-500"></div>
+          <p className="mt-4 text-onyx-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-timberwolf-50 flex items-center justify-center p-6">

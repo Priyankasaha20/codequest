@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,31 +11,37 @@ import {
   Play,
   Activity,
 } from "lucide-react";
-import { useAppContext } from "../../contexts/AppContext";
 
 const DashboardScreen = () => {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const { isLoggedIn } = useAppContext();
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push("/login");
-    }
-  }, [isLoggedIn, router]);
+  // While NextAuth is checking session
+  if (status === "loading") {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-claret-500"></div>
+      </div>
+    );
+  }
 
-  if (!isLoggedIn) {
-    return null; // or a loading spinner
+  // If no session, redirect to login
+  if (!session) {
+    router.push("/login");
+    return null;
   }
 
   return (
     <div className="p-6 space-y-6">
+      {" "}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-onyx-500">Welcome back!</h1>
+        <h1 className="text-2xl font-bold text-onyx-500">
+          Welcome back, {session.user?.name || session.user?.email}!
+        </h1>
         <div className="text-sm text-onyx-600">
           Today: {new Date().toLocaleDateString()}
         </div>
       </div>
-
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg border border-alabaster-200">
@@ -74,7 +81,6 @@ const DashboardScreen = () => {
           </div>
         </div>
       </div>
-
       {/* Today's Challenge */}
       <div className="bg-white rounded-lg border border-alabaster-200 p-6">
         <h2 className="text-lg font-semibold text-onyx-500 mb-4">
@@ -98,7 +104,6 @@ const DashboardScreen = () => {
           </Link>
         </div>
       </div>
-
       {/* Quick Links */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-alabaster-200 p-6">
