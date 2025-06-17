@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Zap,
   CheckCircle,
@@ -7,8 +10,22 @@ import {
   Play,
   Activity,
 } from "lucide-react";
+import { useAppContext } from "../../contexts/AppContext";
 
-const DashboardScreen = ({ setCurrentScreen }) => {
+const DashboardScreen = () => {
+  const router = useRouter();
+  const { isLoggedIn } = useAppContext();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoggedIn, router]);
+
+  if (!isLoggedIn) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -71,14 +88,14 @@ const DashboardScreen = ({ setCurrentScreen }) => {
             <p className="text-sm text-onyx-600">
               Difficulty: Hard • Expected Time: 30 mins
             </p>
-          </div>
-          <button
-            onClick={() => setCurrentScreen("daily")}
+          </div>{" "}
+          <Link
+            href="/daily-challenge"
             className="bg-claret-500 hover:bg-claret-600 text-white px-4 py-2 rounded-lg flex items-center"
           >
             <Play size={16} className="mr-2" />
             Start
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -120,9 +137,9 @@ const DashboardScreen = ({ setCurrentScreen }) => {
               <Activity size={16} className="text-tea-green-500" />
               <span className="text-sm text-onyx-600">
                 Practiced mock interview
-              </span>
+              </span>{" "}
             </div>
-          </div>
+          </div>{" "}
         </div>
       </div>
     </div>

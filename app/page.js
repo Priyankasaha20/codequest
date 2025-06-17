@@ -1,8 +1,8 @@
 import React from "react";
-import PlacementPortalClient from "../components/PlacementPortalClient";
+import HomeScreen from "../components/screens/HomeScreen";
 
-const PlacementPortal = () => {
-  return <PlacementPortalClient />;
+const HomePage = () => {
+  return <HomeScreen />;
 };
 
-export default PlacementPortal;
+export default HomePage;

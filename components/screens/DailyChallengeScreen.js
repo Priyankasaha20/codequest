@@ -1,12 +1,23 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
+import { useAppContext } from "../../contexts/AppContext";
 
-const DailyChallengeScreen = ({
-  timer,
-  timerActive,
-  setTimerActive,
-  formatTime,
-}) => {
+const DailyChallengeScreen = () => {
+  const router = useRouter();
+  const { isLoggedIn, timer, timerActive, setTimerActive, formatTime } =
+    useAppContext();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoggedIn, router]);
+
+  if (!isLoggedIn) {
+    return null; // or a loading spinner
+  }
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="bg-white rounded-lg border border-alabaster-200 p-6">

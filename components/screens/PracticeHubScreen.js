@@ -1,7 +1,22 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Filter, CheckCircle } from "lucide-react";
+import { useAppContext } from "../../contexts/AppContext";
 
 const PracticeHubScreen = () => {
+  const router = useRouter();
+  const { isLoggedIn } = useAppContext();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoggedIn, router]);
+
+  if (!isLoggedIn) {
+    return null; // or a loading spinner
+  }
   const problems = [
     {
       title: "Two Sum",

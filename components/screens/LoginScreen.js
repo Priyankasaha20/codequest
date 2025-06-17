@@ -1,7 +1,13 @@
+"use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
+import { useAppContext } from "../../contexts/AppContext";
 
-const LoginScreen = ({ setCurrentScreen, setIsLoggedIn }) => {
+const LoginScreen = () => {
+  const router = useRouter();
+  const { setIsLoggedIn } = useAppContext();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,35 +28,36 @@ const LoginScreen = ({ setCurrentScreen, setIsLoggedIn }) => {
     e.preventDefault();
     // Here you would integrate with your authentication service
     setIsLoggedIn(true);
-    setCurrentScreen("dashboard");
+    router.push("/dashboard");
   };
 
   const handleGoogleAuth = () => {
     // Integration with Google OAuth
     console.log("Google Auth initiated");
     setIsLoggedIn(true);
-    setCurrentScreen("dashboard");
+    router.push("/dashboard");
   };
 
   const handleGitHubAuth = () => {
     // Integration with GitHub OAuth
     console.log("GitHub Auth initiated");
     setIsLoggedIn(true);
-    setCurrentScreen("dashboard");
+    router.push("/dashboard");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-alabaster-50 via-white to-timberwolf-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
+        {" "}
         {/* Back Button */}
-        <button
-          onClick={() => setCurrentScreen("home")}
+        <Link
+          href="/"
           className="flex items-center text-onyx-600 hover:text-claret-500 mb-8 transition-colors"
         >
+          {" "}
           <ArrowLeft className="w-5 h-5 mr-2" />
           Back to Home
-        </button>
-
+        </Link>
         {/* Login Card */}
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-alabaster-200">
           <div className="text-center mb-8">
@@ -234,7 +241,6 @@ const LoginScreen = ({ setCurrentScreen, setIsLoggedIn }) => {
             </p>
           )}
         </div>
-
         {/* Success Features */}
         <div className="mt-8 text-center">
           <p className="text-sm text-onyx-600 mb-4">Trusted by students from</p>

@@ -1,12 +1,32 @@
+"use client";
 import React from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
-const Sidebar = ({
-  navigation,
-  currentScreen,
-  setCurrentScreen,
-  sidebarOpen,
-  setSidebarOpen,
-}) => {
+const Sidebar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
+  const pathname = usePathname();
+  const router = useRouter();
+  // Map navigation IDs to routes
+  const getRouteFromId = (id) => {
+    const routeMap = {
+      dashboard: "/dashboard",
+      practice: "/practice-hub",
+      daily: "/daily-challenge",
+      learning: "/learning",
+      quizzes: "/quizzes",
+      companies: "/companies",
+      ai_coach: "/ai_coach",
+      multiplayer: "/multiplayer",
+      analytics: "/analytics",
+      profile: "/profile",
+    };
+    return routeMap[id] || `/${id}`;
+  };
+
+  const isCurrentRoute = (id) => {
+    const route = getRouteFromId(id);
+    return pathname === route;
+  };
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-alabaster-200 transform ${
@@ -14,24 +34,21 @@ const Sidebar = ({
       } transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:inset-0`}
     >
       <div className="flex flex-col h-full">
-      
         <nav className="flex-1 p-4 space-y-2">
           {navigation.map((item) => (
-            <button
+            <Link
               key={item.id}
-              onClick={() => {
-                setCurrentScreen(item.id);
-                setSidebarOpen(false);
-              }}
+              href={getRouteFromId(item.id)}
+              onClick={() => setSidebarOpen(false)}
               className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                currentScreen === item.id
+                isCurrentRoute(item.id)
                   ? "bg-tea-green-200 text-onyx-700"
                   : "text-onyx-600 hover:bg-alabaster-100"
               }`}
             >
               <item.icon size={18} className="mr-3" />
               {item.name}
-            </button>
+            </Link>
           ))}
         </nav>
       </div>
