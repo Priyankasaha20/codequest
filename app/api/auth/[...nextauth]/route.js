@@ -8,12 +8,12 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET ?? "development-secret-key",
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "demo",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "demo",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_ID ?? "demo",
-      clientSecret: process.env.GITHUB_SECRET ?? "demo",
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
       authorization: {
         params: {
           prompt: "login"
