@@ -13,7 +13,7 @@ const handler = NextAuth({
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientSecret: process.env.GITHUB_SECRET ?? "demo",
       authorization: {
         params: {
           prompt: "login"
