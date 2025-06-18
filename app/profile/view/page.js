@@ -1,10 +1,8 @@
-"use client";
 import React from "react";
 import { useSession } from "next-auth/react";
-import AuthenticatedLayout from "../../components/AuthenticatedLayout";
-import SubjectQuizzesScreen from "@/components/screens/SubjectQuizzesScreen";
+import ProfileScreen from "@/components/screens/ProfileScreen";
 
-export default function SubjectQuizzesPage() {
+export default function ProfileViewPage() {
   const { status } = useSession();
   if (status === "loading")
     return (
@@ -16,9 +14,5 @@ export default function SubjectQuizzesPage() {
     if (typeof window !== "undefined") window.location.href = "/login";
     return null;
   }
-  return (
-    <AuthenticatedLayout>
-      <SubjectQuizzesScreen />
-    </AuthenticatedLayout>
-  );
+  return <ProfileScreen />;
 }
