@@ -1,20 +1,24 @@
+"use client";
 import React from "react";
+import { useSession } from "next-auth/react";
 import AuthenticatedLayout from "../../components/AuthenticatedLayout";
+import AnalyticsScreen from "@/components/screens/AnalyticsScreen";
 
 export default function AnalyticsPage() {
+  const { status } = useSession();
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  if (status === "unauthenticated") {
+    if (typeof window !== "undefined") window.location.href = "/login";
+    return null;
+  }
   return (
     <AuthenticatedLayout>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-onyx-500 mb-4">
-          Analytics & Reports
-        </h1>
-        <div className="bg-white rounded-lg border border-alabaster-200 p-8 text-center">
-          <p className="text-onyx-600">This screen is under development.</p>
-          <p className="text-sm text-onyx-500 mt-2">
-            Features for Analytics & Reports will be available soon.
-          </p>
-        </div>
-      </div>
+      <AnalyticsScreen />
     </AuthenticatedLayout>
   );
 }

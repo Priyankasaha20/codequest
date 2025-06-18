@@ -14,7 +14,7 @@ const Sidebar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
       daily: "/daily-challenge",
       learning: "/learning",
       quizzes: "/quizzes",
-      companies: "/companies",
+      companies: "/company-prep",
       ai_coach: "/ai_coach",
       multiplayer: "/multiplayer",
       analytics: "/analytics",

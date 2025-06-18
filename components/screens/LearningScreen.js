@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { BookOpen, CheckCircle, PlayCircle, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 const learningModules = [
   {
@@ -41,22 +42,52 @@ const learningModules = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 40 },
+  visible: (i) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { delay: i * 0.12, type: "spring", stiffness: 60 },
+  }),
+};
+
 const LearningScreen = () => {
   return (
     <div className="min-h-screen bg-gradient-background p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl montserrat-bold text-onyx-700 mb-2">
-          Learning Hub
-        </h1>
-        <p className="text-onyx-500 montserrat-regular">
-          Track your progress and continue your learning journey
-        </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl montserrat-bold text-onyx-700 mb-2 flex items-center gap-2">
+            <BookOpen className="w-8 h-8 text-claret-500" /> Learning Path
+          </h1>
+          <p className="text-onyx-500 montserrat-regular">
+            Track your progress and continue your learning journey
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button className="btn-primary px-6 py-2 montserrat-semibold shadow-md hover:shadow-lg transition">
+            My Certificates
+          </button>
+          <button className="btn-outline px-6 py-2 montserrat-semibold">
+            Leaderboard
+          </button>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {learningModules.map((module) => (
-          <div key={module.id} className="card animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {learningModules.map((module, i) => (
+          <motion.div
+            key={module.id}
+            className={`card animate-fade-in shadow-xl hover:scale-[1.03] hover:shadow-2xl transition-transform duration-200 border-2 ${
+              module.completed ? "border-tea-green-400" : "border-alabaster-200"
+            }`}
+            custom={i}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={cardVariants}
+          >
             <div className="card-content flex flex-col h-full">
-              <div className="flex items-center mb-3">
+              <div className="flex items-center mb-4">
                 <BookOpen className="w-7 h-7 text-claret-500 mr-2" />
                 <h2 className="text-xl montserrat-semibold text-onyx-700 flex-1">
                   {module.title}
@@ -74,13 +105,23 @@ const LearningScreen = () => {
                   </span>
                 )}
               </div>
-              <p className="text-onyx-600 mb-4 flex-1">{module.description}</p>
+              <p className="text-onyx-600 mb-4 flex-1 montserrat-regular">
+                {module.description}
+              </p>
               <div className="mb-3">
                 <div className="w-full bg-alabaster-200 rounded-full h-2">
-                  <div
-                    className="bg-claret-500 h-2 rounded-full transition-all duration-300"
+                  <motion.div
+                    className="bg-claret-500 h-2 rounded-full"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${module.progress}%` }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{
+                      duration: 0.7,
+                      delay: i * 0.1,
+                      type: "spring",
+                    }}
                     style={{ width: `${module.progress}%` }}
-                  ></div>
+                  ></motion.div>
                 </div>
                 <div className="flex justify-between text-xs text-onyx-500 mt-1">
                   <span>{module.progress}% complete</span>
@@ -90,7 +131,7 @@ const LearningScreen = () => {
                 </div>
               </div>
               <button
-                className={`btn-primary flex items-center justify-center mt-auto ${
+                className={`btn-primary flex items-center justify-center mt-auto montserrat-semibold text-base ${
                   module.completed ? "opacity-60 cursor-not-allowed" : ""
                 }`}
                 disabled={module.completed}
@@ -99,7 +140,7 @@ const LearningScreen = () => {
                 {module.completed ? "Completed" : "Continue Learning"}
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

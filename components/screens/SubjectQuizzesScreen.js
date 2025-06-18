@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { BookOpen, CheckCircle, PlayCircle, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 const subjectQuizzes = [
   {
@@ -45,6 +46,16 @@ const subjectQuizzes = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 40 },
+  visible: (i) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { delay: i * 0.12, type: "spring", stiffness: 60 },
+  }),
+};
+
 const SubjectQuizzesScreen = () => {
   return (
     <div className="min-h-screen bg-gradient-background p-6">
@@ -58,8 +69,16 @@ const SubjectQuizzesScreen = () => {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {subjectQuizzes.map((quiz) => (
-          <div key={quiz.id} className="card animate-fade-in">
+        {subjectQuizzes.map((quiz, i) => (
+          <motion.div
+            key={quiz.id}
+            className="card animate-fade-in shadow-xl hover:scale-[1.025] hover:shadow-2xl transition-transform duration-200"
+            custom={i}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={cardVariants}
+          >
             <div className="card-content flex flex-col h-full">
               <div className="flex items-center mb-3">
                 <BookOpen className="w-7 h-7 text-claret-500 mr-2" />
@@ -101,7 +120,7 @@ const SubjectQuizzesScreen = () => {
                 {quiz.completed ? "Completed" : "Start Quiz"}
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
