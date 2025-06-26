@@ -1,5 +1,6 @@
-'use client'
+"use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Filter,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 const PracticeHubScreen = () => {
+  const router = useRouter();
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const [selectedTopic, setSelectedTopic] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -166,6 +168,20 @@ const PracticeHubScreen = () => {
       default:
         return "text-onyx-600 bg-onyx-100";
     }
+  };
+
+  const convertToUrlFriendly = (title) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+      .trim("-"); // Remove leading/trailing hyphens
+  };
+
+  const handleSolveProblem = (problemTitle) => {
+    const urlFriendlyName = convertToUrlFriendly(problemTitle);
+    router.push(`/practice-hub/${urlFriendlyName}`);
   };
 
   const filteredProblems = problems.filter((problem) => {
@@ -370,7 +386,10 @@ const PracticeHubScreen = () => {
                     </div>
 
                     <div className="flex flex-col items-end space-y-2">
-                      <button className="btn-primary">
+                      <button
+                        className="btn-primary"
+                        onClick={() => handleSolveProblem(problem.title)}
+                      >
                         {problem.solved ? "Solve Again" : "Solve"}
                       </button>
                       {problem.attempts > 0 && (
