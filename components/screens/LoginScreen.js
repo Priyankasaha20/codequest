@@ -7,13 +7,10 @@ import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
 
 const LoginScreen = () => {
   const router = useRouter();
-  const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
-    name: "",
   });
 
   const handleInputChange = (e) => {
@@ -80,13 +77,9 @@ const LoginScreen = () => {
             <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-bold text-white">P</span>
             </div>
-            <h1 className="text-2xl font-bold text-onyx-700">
-              {isSignUp ? "Create Account" : "Welcome Back"}
-            </h1>
+            <h1 className="text-2xl font-bold text-onyx-700">Welcome Back</h1>
             <p className="text-onyx-600 mt-2">
-              {isSignUp
-                ? "Start your journey to career success"
-                : "Sign in to continue your preparation"}
+              Sign in to continue your preparation
             </p>
           </div>
 
@@ -127,23 +120,6 @@ const LoginScreen = () => {
 
           {/* Email Form */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
-            {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium text-onyx-700 mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-alabaster-200 rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all"
-                  placeholder="Enter your full name"
-                  required={isSignUp}
-                />
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-onyx-700 mb-2">
                 Email Address
@@ -190,72 +166,39 @@ const LoginScreen = () => {
               </div>
             </div>
 
-            {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium text-onyx-700 mb-2">
-                  Confirm Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-alabaster-200 rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all"
-                  placeholder="Confirm your password"
-                  required={isSignUp}
-                />
-              </div>
-            )}
-
-            {!isSignUp && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input type="checkbox" className="mr-2 rounded" />
-                  <span className="text-sm text-onyx-600">Remember me</span>
-                </label>
-                <button
-                  type="button"
-                  className="text-sm text-claret-500 hover:text-claret-600"
-                >
-                  Forgot password?
-                </button>
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input type="checkbox" className="mr-2 rounded" />
+                <span className="text-sm text-onyx-600">Remember me</span>
+              </label>
+              <button
+                type="button"
+                className="text-sm text-claret-500 hover:text-claret-600"
+              >
+                Forgot password?
+              </button>
+            </div>
 
             <button
               type="submit"
               className="w-full bg-gradient-primary text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
             >
-              {isSignUp ? "Create Account" : "Sign In"}
+              Sign In
             </button>
           </form>
 
-          {/* Toggle Sign Up/Sign In */}
+          {/* Register Link */}
           <div className="text-center mt-6">
             <p className="text-onyx-600">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}
-              <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-claret-500 hover:text-claret-600 font-medium ml-1"
+              Don't have an account?{" "}
+              <Link
+                href="/register"
+                className="text-claret-500 hover:text-claret-600 font-medium"
               >
-                {isSignUp ? "Sign In" : "Sign Up"}
-              </button>
+                Create Account
+              </Link>
             </p>
           </div>
-
-          {/* Terms */}
-          {isSignUp && (
-            <p className="text-xs text-onyx-500 text-center mt-4">
-              By creating an account, you agree to our{" "}
-              <a href="#" className="text-claret-500 hover:underline">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-claret-500 hover:underline">
-                Privacy Policy
-              </a>
-            </p>
-          )}
         </div>
         {/* Success Features */}
         <div className="mt-8 text-center">

@@ -38,12 +38,18 @@ const HomeScreen = () => {
               className="text-onyx-600 hover:text-claret-500 transition-colors montserrat-regular"
             >
               Success Stories
-            </a>{" "}
+            </a>
             <Link
               href="/login"
-              className="bg-claret-500 text-white hover:bg-claret-600 font-medium px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg montserrat-medium"
+              className="text-onyx-600 hover:text-claret-500 transition-colors montserrat-regular"
             >
               Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="bg-claret-500 text-white hover:bg-claret-600 font-medium px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg montserrat-medium"
+            >
+              Get Started
             </Link>
           </div>
         </div>
@@ -72,7 +78,7 @@ const HomeScreen = () => {
               </div>{" "}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/login"
+                  href="/register"
                   className="bg-claret-500 text-white hover:bg-claret-600 px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg flex items-center justify-center montserrat-semibold"
                 >
                   Get Started Free
