@@ -2,39 +2,70 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
 
 const LoginScreen = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   // hardcode states like status
   const status = "authenticated"; // or "authenticated", "loading"
 
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    const result = await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      redirect: false,
-    });
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    clearErrors();
 
-    if (result?.ok) {
+    try {
+      // Make direct fetch from client side to ensure cookies are stored
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+        }/api/auth/login`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.status === 401) {
+        setError("root", { message: "Invalid email or password" });
+        return;
+      }
+
+      if (!response.ok) {
+        setError("root", { message: "Login failed. Please try again." });
+        return;
+      }
+
+      const result = await response.json();
+
+      // Handle successful login
       router.push("/dashboard");
-    } else {
-      alert("Invalid credentials");
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("root", { message: "Login failed. Please try again." });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,7 +150,13 @@ const LoginScreen = () => {
           </div>
 
           {/* Email Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {errors.root && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                {errors.root.message}
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-onyx-700 mb-2">
                 Email Address
@@ -128,14 +165,24 @@ const LoginScreen = () => {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-onyx-400" />
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-alabaster-200 rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Please enter a valid email",
+                    },
+                  })}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
+                    errors.email ? "border-red-300" : "border-alabaster-200"
+                  }`}
                   placeholder="Enter your email"
-                  required
                 />
               </div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -145,12 +192,13 @@ const LoginScreen = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 pr-10 border border-alabaster-200 rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all"
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                  className={`w-full px-4 py-3 pr-10 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
+                    errors.password ? "border-red-300" : "border-alabaster-200"
+                  }`}
                   placeholder="Enter your password"
-                  required
                 />
                 <button
                   type="button"
@@ -164,6 +212,11 @@ const LoginScreen = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -181,9 +234,17 @@ const LoginScreen = () => {
 
             <button
               type="submit"
-              className="w-full bg-claret-500 hover:bg-claret-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+              disabled={isLoading}
+              className="w-full bg-claret-500 hover:bg-claret-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Sign In
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 

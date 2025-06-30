@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -19,87 +20,69 @@ const RegisterScreen = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  });
-  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  });
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
-    }
-  };
+  const watchPassword = watch("password");
+  const watchConfirmPassword = watch("confirmPassword");
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Full name is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match";
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmit = async (data) => {
     setIsLoading(true);
+    clearErrors();
 
     try {
-      // Here you would typically make an API call to register the user
-      // For now, we'll simulate a successful registration
-      console.log("Registering user:", formData);
+      // Make direct fetch from client side
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+        }/api/auth/register`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (response.status === 409) {
+        setError("email", { message: "Email already exists" });
+        return;
+      }
 
-      // After successful registration, redirect to login or dashboard
+      if (!response.ok) {
+        setError("root", { message: "Registration failed. Please try again." });
+        return;
+      }
+
+      const result = await response.json();
+
+      // Redirect to login page with success message
       router.push("/login?registered=true");
     } catch (error) {
       console.error("Registration error:", error);
-      setErrors({ submit: "Registration failed. Please try again." });
+      setError("root", { message: "Registration failed. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +97,7 @@ const RegisterScreen = () => {
   };
 
   const passwordStrength = () => {
-    const password = formData.password;
+    const password = watchPassword || "";
     let strength = 0;
 
     if (password.length >= 8) strength++;
@@ -204,10 +187,10 @@ const RegisterScreen = () => {
           </div>
 
           {/* Registration Form */}
-          <form onSubmit={handleRegister} className="space-y-4">
-            {errors.submit && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
-                {errors.submit}
+                {errors.root.message}
               </div>
             )}
 
@@ -220,9 +203,13 @@ const RegisterScreen = () => {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-onyx-400" />
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
+                  {...register("name", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
                   className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
                     errors.name ? "border-red-300" : "border-alabaster-200"
                   }`}
@@ -230,7 +217,9 @@ const RegisterScreen = () => {
                 />
               </div>
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -243,9 +232,13 @@ const RegisterScreen = () => {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-onyx-400" />
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Please enter a valid email",
+                    },
+                  })}
                   className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
                     errors.email ? "border-red-300" : "border-alabaster-200"
                   }`}
@@ -253,7 +246,9 @@ const RegisterScreen = () => {
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -266,9 +261,13 @@ const RegisterScreen = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-onyx-400" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters",
+                    },
+                  })}
                   className={`w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
                     errors.password ? "border-red-300" : "border-alabaster-200"
                   }`}
@@ -288,7 +287,7 @@ const RegisterScreen = () => {
               </div>
 
               {/* Password Strength Indicator */}
-              {formData.password && (
+              {watchPassword && (
                 <div className="mt-2">
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -305,7 +304,9 @@ const RegisterScreen = () => {
               )}
 
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -318,9 +319,11 @@ const RegisterScreen = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-onyx-400" />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                    validate: (value) =>
+                      value === watchPassword || "Passwords don't match",
+                  })}
                   className={`w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-claret-300 focus:border-claret-400 transition-all ${
                     errors.confirmPassword
                       ? "border-red-300"
@@ -342,11 +345,11 @@ const RegisterScreen = () => {
               </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword}
+                  {errors.confirmPassword.message}
                 </p>
               )}
-              {formData.confirmPassword &&
-                formData.password === formData.confirmPassword && (
+              {watchConfirmPassword &&
+                watchPassword === watchConfirmPassword && (
                   <div className="flex items-center mt-1 text-green-600">
                     <CheckCircle className="w-4 h-4 mr-1" />
                     <span className="text-sm">Passwords match</span>
@@ -359,9 +362,9 @@ const RegisterScreen = () => {
               <label className="flex items-start">
                 <input
                   type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleInputChange}
+                  {...register("agreeToTerms", {
+                    required: "You must agree to the terms and conditions",
+                  })}
                   className={`mt-1 mr-3 rounded ${
                     errors.agreeToTerms ? "border-red-300" : ""
                   }`}
@@ -385,7 +388,7 @@ const RegisterScreen = () => {
               </label>
               {errors.agreeToTerms && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.agreeToTerms}
+                  {errors.agreeToTerms.message}
                 </p>
               )}
             </div>

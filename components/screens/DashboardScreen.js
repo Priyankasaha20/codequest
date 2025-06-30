@@ -11,19 +11,11 @@ import {
   Activity,
 } from "lucide-react";
 
-const DashboardScreen = () => {
-  // hardcode session and status for this example
-  const session = {
-    user: {
-      name: "John Doe",
-      email: "john@example.com",
-    },
-  };
-  const status = "authenticated"; // or "loading", "unauthenticated"
+const DashboardScreen = ({ user }) => {
   const router = useRouter();
 
-  // While NextAuth is checking session
-  if (status === "loading") {
+  // While user data is loading
+  if (!user) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-claret-500"></div>
@@ -31,20 +23,27 @@ const DashboardScreen = () => {
     );
   }
 
-  // If no session, redirect to login
-  if (!session) {
+  // If no user data, redirect to login
+  if (!user.user) {
     router.push("/login");
     return null;
   }
+
+  const userData = user.user;
 
   return (
     <div className="min-h-screen bg-gradient-background p-6">
       <div className="mb-8">
         <h1 className="text-3xl montserrat-bold text-onyx-700 mb-2">
-          Welcome back, {session.user?.name || session.user?.email}!
+          Welcome back, {userData.name}!
         </h1>
-        <div className="text-sm text-onyx-600">
-          Today: {new Date().toLocaleDateString()}
+        <div className="text-sm text-onyx-600 space-y-1">
+          <div>Email: {userData.email}</div>
+          <div>
+            Member since: {new Date(userData.createdAt).toLocaleDateString()}
+          </div>
+          <div>Email verified: {userData.emailVerified ? "Yes" : "No"}</div>
+          <div>Today: {new Date().toLocaleDateString()}</div>
         </div>
       </div>
       {/* Quick Stats */}
