@@ -157,7 +157,7 @@ const RegisterScreen = () => {
         {/* Register Card */}
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-alabaster-200">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-claret-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-bold text-white">P</span>
             </div>
             <h1 className="text-2xl font-bold text-onyx-700">
@@ -394,7 +394,7 @@ const RegisterScreen = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-primary text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full bg-claret-500 hover:bg-claret-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

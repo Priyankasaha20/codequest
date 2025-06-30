@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import {
   User,
@@ -203,7 +203,7 @@ const ProfileScreen = () => {
           <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
             {/* Profile Picture */}
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-primary rounded-full flex items-center justify-center text-white text-4xl montserrat-bold">
+              <div className="w-32 h-32 bg-claret-500 rounded-full flex items-center justify-center text-white text-4xl montserrat-bold">
                 {profileData.firstName[0]}
                 {profileData.lastName[0]}
               </div>
