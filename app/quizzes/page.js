@@ -5,7 +5,7 @@ import AuthenticatedLayout from "../../components/AuthenticatedLayout";
 import SubjectQuizzesScreen from "@/components/screens/SubjectQuizzesScreen";
 
 export default function SubjectQuizzesPage() {
-  const { status } = useSession();
+  const status = "authenticated"; // hardcoded for this example
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-screen">

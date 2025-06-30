@@ -7,7 +7,6 @@ import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
 
 const LoginScreen = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,19 +16,15 @@ const LoginScreen = () => {
     name: "",
   });
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (session) {
-      router.push("/dashboard");
-    }
-  }, [session, router]);
-
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
+  // hardcode states like status
+  const status = "authenticated"; // or "authenticated", "loading"
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();

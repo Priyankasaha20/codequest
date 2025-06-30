@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
-import { useSession } from "next-auth/react";
 import AuthenticatedLayout from "../../components/AuthenticatedLayout";
 import AnalyticsScreen from "@/components/screens/AnalyticsScreen";
 
 export default function AnalyticsPage() {
-  const { status } = useSession();
+  const status = "authenticated"; // hardcoded for this example
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-screen">

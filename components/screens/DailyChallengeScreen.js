@@ -6,7 +6,16 @@ import { Clock } from "lucide-react";
 import { useTimer } from "../../contexts/TimerContext";
 
 const DailyChallengeScreen = () => {
-  const { data: session, status } = useSession();
+  // hardcode session and status for this example
+  const session = {
+    user: {
+      name: "John Doe",
+      email: "john@example.com",
+    },
+  };
+  const status = "authenticated"; // or "loading", "unauthenticated"
+
+  
   const router = useRouter();
   const { timer, timerActive, setTimerActive, formatTime } = useTimer();
 

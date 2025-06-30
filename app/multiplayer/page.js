@@ -5,7 +5,7 @@ import AuthenticatedLayout from "../../components/AuthenticatedLayout";
 import MultiplayerArenaScreen from "@/components/screens/MultiplayerArenaScreen";
 
 export default function MultiplayerPage() {
-  const { status } = useSession();
+  const status = "authenticated"; // hardcoded for this example
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-screen">

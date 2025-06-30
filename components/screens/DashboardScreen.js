@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,7 +12,14 @@ import {
 } from "lucide-react";
 
 const DashboardScreen = () => {
-  const { data: session, status } = useSession();
+  // hardcode session and status for this example
+  const session = {
+    user: {
+      name: "John Doe",
+      email: "john@example.com",
+    },
+  };
+  const status = "authenticated"; // or "loading", "unauthenticated"
   const router = useRouter();
 
   // While NextAuth is checking session
