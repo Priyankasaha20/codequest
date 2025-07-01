@@ -5,6 +5,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { ArrowLeft, Github, Mail, Eye, EyeOff, Chrome } from "lucide-react";
+import { loginService } from "../../lib/services/authService";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -30,43 +31,13 @@ const LoginScreen = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     clearErrors();
-
-    try {
-      // Make direct fetch from client side to ensure cookies are stored
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-        }/api/auth/login`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (response.status === 401) {
-        setError("root", { message: "Invalid email or password" });
-        return;
-      }
-
-      if (!response.ok) {
-        setError("root", { message: "Login failed. Please try again." });
-        return;
-      }
-
-      const result = await response.json();
-
-      // Handle successful login
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("root", { message: "Login failed. Please try again." });
-    } finally {
-      setIsLoading(false);
+    const result = await loginService(data);
+    setIsLoading(false);
+    if (!result.success) {
+      setError("root", { message: result.error });
+      return;
     }
+    router.push("/dashboard");
   };
 
   const handleGoogleAuth = () => {

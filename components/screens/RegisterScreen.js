@@ -15,12 +15,13 @@ import {
   Lock,
   CheckCircle,
 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 const RegisterScreen = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, error, register: registerUser } = useAuth();
 
   const {
     register,
@@ -43,49 +44,8 @@ const RegisterScreen = () => {
   const watchConfirmPassword = watch("confirmPassword");
 
   const onSubmit = async (data) => {
-    setIsLoading(true);
-    clearErrors();
-
-    try {
-      // Make direct fetch from client side
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-        }/api/auth/register`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: data.name,
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
-
-      if (response.status === 409) {
-        setError("email", { message: "Email already exists" });
-        return;
-      }
-
-      if (!response.ok) {
-        setError("root", { message: "Registration failed. Please try again." });
-        return;
-      }
-
-      const result = await response.json();
-
-      // Redirect to login page with success message
-      router.push("/login?registered=true");
-    } catch (error) {
-      console.error("Registration error:", error);
-      setError("root", { message: "Registration failed. Please try again." });
-    } finally {
-      setIsLoading(false);
-    }
+    const success = await registerUser(data);
+    if (success) router.push("/login?registered=true");
   };
 
   const handleGoogleAuth = () => {
@@ -408,6 +368,7 @@ const RegisterScreen = () => {
                 "Create Account"
               )}
             </button>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </form>
 
           {/* Login Link */}

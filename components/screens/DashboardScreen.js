@@ -23,11 +23,6 @@ const DashboardScreen = ({ user }) => {
     );
   }
 
-  // If no user data, redirect to login
-  if (!user.user) {
-    router.push("/login");
-    return null;
-  }
 
   const userData = user.user;
 
