@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   loginService,
   registerService,
@@ -34,7 +34,7 @@ export function useAuth() {
     return true;
   };
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     const result = await meService();
@@ -45,7 +45,7 @@ export function useAuth() {
     }
     setUser(result.data);
     return result.data;
-  };
+  }, []);
 
   return {
     isLoading,

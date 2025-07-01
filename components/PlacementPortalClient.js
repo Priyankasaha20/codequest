@@ -7,7 +7,7 @@ import LoginScreen from "./screens/LoginScreen";
 import DashboardScreen from "./screens/DashboardScreen";
 import DailyChallengeScreen from "./screens/DailyChallengeScreen";
 import PracticeHubScreen from "./screens/PracticeHubScreen";
-import { navigation, screens } from "../data/navigationData";
+import { navigation, screens } from "../utils/navigationData";
 
 const PlacementPortalClient = () => {
   const [currentScreen, setCurrentScreen] = useState("home");

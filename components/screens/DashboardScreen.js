@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,19 +10,20 @@ import {
   Play,
   Activity,
 } from "lucide-react";
+import { AuthContext } from "../../contexts/AuthContext";
 
-const DashboardScreen = ({ user }) => {
+const DashboardScreen = () => {
   const router = useRouter();
+  const { user, isLoading } = useContext(AuthContext);
 
   // While user data is loading
-  if (!user) {
+  if (isLoading || !user) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-claret-500"></div>
       </div>
     );
   }
-
 
   const userData = user.user;
 
