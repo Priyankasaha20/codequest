@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   User,
   Mail,
@@ -33,27 +34,21 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ profileData }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [profileData, setProfileData] = useState({
-    firstName: "Priyanka",
-    lastName: "Saha",
-    email: "priyanka.saha@example.com",
-    phone: "+91 98765 43210",
-    location: "Bangalore, India",
-    university: "Indian Institute of Technology",
-    graduationYear: "2024",
-    major: "Computer Science Engineering",
-    bio: "Passionate software developer with expertise in full-stack development. Love solving complex problems and building scalable applications.",
-    github: "github.com/priyankasaha",
-    linkedin: "linkedin.com/in/priyankasaha",
-    portfolio: "priyankasaha.dev",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+  // Map server props to local state
+  const [profileState, setProfileState] = useState({
+    name: profileData.name,
+    email: profileData.email,
+    phoneNumber: profileData.phoneNumber,
+    location: profileData.location,
+    institute: profileData.institute,
+    academicYear: profileData.academicYear,
+    bio: profileData.bio,
+    profilePic: profileData.profilePic,
   });
 
   const achievements = [
@@ -155,7 +150,8 @@ const ProfileScreen = () => {
   ];
 
   const handleInputChange = (field, value) => {
-    setProfileData((prev) => ({ ...prev, [field]: value }));
+    // Update local profile state
+    setProfileState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
@@ -203,9 +199,18 @@ const ProfileScreen = () => {
           <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
             {/* Profile Picture */}
             <div className="relative">
-              <div className="w-32 h-32 bg-claret-500 rounded-full flex items-center justify-center text-white text-4xl montserrat-bold">
-                {profileData.firstName[0]}
-                {profileData.lastName[0]}
+              <div className="w-32 h-32 bg-claret-500 rounded-full overflow-hidden flex items-center justify-center text-white text-4xl montserrat-bold">
+                {profileState.profilePic ? (
+                  <Image
+                    src={profileState.profilePic}
+                    alt={profileState.name}
+                    width={128}
+                    height={128}
+                    className="object-cover"
+                  />
+                ) : (
+                  profileState.name?.charAt(0) || ""
+                )}
               </div>
               <button className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-medium flex items-center justify-center text-onyx-600 hover:bg-alabaster-100 transition-colors">
                 <Camera className="w-4 h-4" />
@@ -217,10 +222,10 @@ const ProfileScreen = () => {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-2xl montserrat-bold text-onyx-700 mb-1">
-                    {profileData.firstName} {profileData.lastName}
+                    {profileState.name}
                   </h2>
                   <p className="text-onyx-500 mb-2">
-                    {profileData.major} • {profileData.university}
+                    {profileState.institute} • {profileState.academicYear}
                   </p>
                   <div className="flex items-center space-x-4 text-sm text-onyx-500">
                     <span className="flex items-center space-x-1">
@@ -354,33 +359,18 @@ const ProfileScreen = () => {
             <div className="card-content space-y-4">
               {isEditing ? (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm montserrat-medium text-onyx-600 mb-1">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        value={profileData.firstName}
-                        onChange={(e) =>
-                          handleInputChange("firstName", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-alabaster-300 rounded-lg focus:ring-2 focus:ring-claret-300 focus:border-claret-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm montserrat-medium text-onyx-600 mb-1">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        value={profileData.lastName}
-                        onChange={(e) =>
-                          handleInputChange("lastName", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-alabaster-300 rounded-lg focus:ring-2 focus:ring-claret-300 focus:border-claret-400"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm montserrat-medium text-onyx-600 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={profileState.name}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-alabaster-300 rounded-lg focus:ring-2 focus:ring-claret-300 focus:border-claret-400"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm montserrat-medium text-onyx-600 mb-1">
@@ -418,18 +408,20 @@ const ProfileScreen = () => {
                   </div>
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-onyx-400" />
-                    <span className="text-onyx-600">{profileData.phone}</span>
+                    <span className="text-onyx-600">
+                      {profileData.phoneNumber}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <MapPin className="w-5 h-5 text-onyx-400" />
                     <span className="text-onyx-600">
-                      {profileData.location}
+                      +{profileData.location}
                     </span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <BookOpen className="w-5 h-5 text-onyx-400" />
                     <span className="text-onyx-600">
-                      {profileData.university}
+                      {profileData.institute}
                     </span>
                   </div>
                 </>
