@@ -15,7 +15,7 @@ const Sidebar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
       learning: "/learning",
       quizzes: "/quizzes",
       companies: "/company-prep",
-      ai_coach: "/ai_coach",
+      ai_coach: "/ai-coach", // Using the hyphenated path
       multiplayer: "/multiplayer",
       analytics: "/analytics",
       profile: "/profile",

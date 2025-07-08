@@ -19,7 +19,7 @@ export const screens = {
   learning: "Learning Path",
   quizzes: "Subject Quizzes",
   companies: "Company Prep",
-  ai_coach: "AI Interview Coach",
+  ai_coach: "AI Interview Coach", // Using the same ID for backward compatibility
   multiplayer: "Multiplayer Arena",
   profile: "Profile & Settings",
   analytics: "Analytics & Reports",

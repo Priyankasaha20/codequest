@@ -7,6 +7,16 @@ import AICoachScreen from "../../components/screens/AICoachScreen";
 export default function AICoachPage() {
   const status = "authenticated"; // hardcoded for this example
 
+  // Redirect to the hyphenated URL version for consistency
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log(
+        "Redirecting from /ai_coach to /ai-coach for URL consistency"
+      );
+      window.location.href = "/ai-coach";
+    }
+  }, []);
+
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-screen">
