@@ -5,7 +5,7 @@ const sessionAnswers = {};
 
 export async function POST(request, { params }) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await params;
     const { questionIndex, text } = await request.json();
 
     if (!sessionId) {

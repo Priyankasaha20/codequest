@@ -31,7 +31,7 @@ const interviewQuestions = {
 
 export async function GET(request, { params }) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await params;
     console.log("GET request for session:", sessionId);
 
     if (!sessionId) {
