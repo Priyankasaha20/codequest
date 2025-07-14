@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import {
   Bot,
   Code,
@@ -156,16 +155,19 @@ const AICoachPage = () => {
 
     console.log("Starting interview with type:", selectedInterviewType);
     setIsStarting(true);
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     try {
-      console.log("Sending request to /api/coach/session/start");
-      const response = await axios.post("/api/coach/session/start", {
-        interviewTypeId: selectedInterviewType,
-      });
-      console.log("API Response:", response);
-      const { data } = response;
+      // Generate dummy session ID
+      const sessionId = `session_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+      console.log("Generated dummy session ID:", sessionId);
 
       // Create the path explicitly using the pathname object
-      const interviewUrl = `/ai-coach/interview/${data.sessionId}`;
+      const interviewUrl = `/ai-coach/interview/${sessionId}`;
       console.log("Redirecting to:", interviewUrl);
 
       // Force a hard navigation instead of client-side routing
