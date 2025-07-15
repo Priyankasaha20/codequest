@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  Clock,
-  CheckCircle,
-  XCircle,
-  ArrowRight,
-  ArrowLeft,
-} from "lucide-react";
+import { Clock, CheckCircle, XCircle } from "lucide-react";
 
 // Dummy quiz data for each subject
 const quizData = {
@@ -529,6 +523,7 @@ export default function QuizPage() {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     // Get random questions for the selected subject
@@ -560,7 +555,7 @@ export default function QuizPage() {
   };
 
   const handleAnswerSelect = (questionId, answerIndex) => {
-    if (quizCompleted) return;
+    if (quizCompleted || isTransitioning) return;
 
     setSelectedAnswers((prev) => ({
       ...prev,
@@ -571,18 +566,20 @@ export default function QuizPage() {
     if (navigator.vibrate) {
       navigator.vibrate(50);
     }
-  };
 
-  const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    }
-  };
+    setIsTransitioning(true);
 
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
+    // Auto-advance to next question after a short delay
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+        setIsTransitioning(false);
+      } else {
+        // If this was the last question, submit the quiz
+        setQuizCompleted(true);
+        calculateScore();
+      }
+    }, 1200); // 1200ms delay to show selection feedback
   };
 
   const calculateScore = () => {
@@ -769,11 +766,29 @@ export default function QuizPage() {
         {/* Question */}
         <motion.div
           key={currentQuestion}
-          initial={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.3 }}
           className="card mb-6"
         >
           <div className="card-content">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-claret-500 text-white rounded-full flex items-center justify-center text-sm montserrat-bold">
+                  {currentQuestion + 1}
+                </div>
+                <span className="text-sm text-onyx-500 montserrat-medium">
+                  of {questions.length}
+                </span>
+              </div>
+              {currentQuestion === questions.length - 1 && (
+                <span className="text-sm text-claret-600 montserrat-semibold bg-claret-50 px-3 py-1 rounded-full">
+                  Final Question
+                </span>
+              )}
+            </div>
+
             <h2 className="text-xl montserrat-semibold text-onyx-700 mb-6">
               {question.question}
             </h2>
@@ -786,6 +801,10 @@ export default function QuizPage() {
                     key={index}
                     data-option={index}
                     onClick={() => handleAnswerSelect(question.id, index)}
+                    disabled={
+                      isTransitioning ||
+                      selectedAnswers[question.id] !== undefined
+                    }
                     initial={false}
                     animate={{
                       scale: isSelected ? 1.02 : 1,
@@ -796,6 +815,8 @@ export default function QuizPage() {
                     className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
                       isSelected
                         ? "border-claret-500 bg-claret-100 text-claret-800 shadow-lg ring-2 ring-claret-200"
+                        : selectedAnswers[question.id] !== undefined
+                        ? "border-alabaster-200 bg-alabaster-50 text-onyx-400 cursor-not-allowed"
                         : "border-alabaster-300 hover:border-claret-300 hover:bg-claret-25 hover:shadow-md"
                     }`}
                   >
@@ -804,6 +825,8 @@ export default function QuizPage() {
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 text-sm montserrat-semibold transition-all duration-200 ${
                           isSelected
                             ? "border-claret-500 bg-claret-500 text-white transform scale-110 shadow-md"
+                            : selectedAnswers[question.id] !== undefined
+                            ? "border-alabaster-300 text-alabaster-400"
                             : "border-alabaster-400 text-onyx-600 hover:border-claret-400"
                         }`}
                       >
@@ -817,6 +840,8 @@ export default function QuizPage() {
                         className={`montserrat-medium transition-all duration-200 ${
                           isSelected
                             ? "font-semibold text-claret-800"
+                            : selectedAnswers[question.id] !== undefined
+                            ? "text-onyx-400"
                             : "text-onyx-700"
                         }`}
                       >
@@ -840,42 +865,47 @@ export default function QuizPage() {
           </div>
         </motion.div>
 
-        {/* Navigation */}
+        {/* Progress Indicator */}
         <div className="card">
           <div className="card-content">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestion === 0}
-                className="btn-secondary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </button>
-
-              <div className="text-center">
-                <span className="text-sm text-onyx-500">
-                  {Object.keys(selectedAnswers).length} of {questions.length}{" "}
-                  answered
+            <div className="text-center">
+              <div className="mb-4">
+                <span className="text-sm text-onyx-500 montserrat-medium">
+                  Question {currentQuestion + 1} of {questions.length}
                 </span>
               </div>
-
-              {currentQuestion === questions.length - 1 ? (
-                <button
-                  onClick={handleSubmitQuiz}
-                  className="btn-primary flex items-center montserrat-semibold"
-                >
-                  Submit Quiz
-                  <CheckCircle className="w-4 h-4 ml-2" />
-                </button>
-              ) : (
-                <button
-                  onClick={handleNext}
-                  className="btn-primary flex items-center"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </button>
+              <div className="flex justify-center items-center space-x-2 mb-4">
+                {questions.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index < currentQuestion
+                        ? "bg-tea-green-500"
+                        : index === currentQuestion
+                        ? "bg-claret-500 scale-150"
+                        : "bg-alabaster-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <div className="text-sm text-onyx-500">
+                {selectedAnswers[question.id] !== undefined
+                  ? currentQuestion === questions.length - 1
+                    ? "Submitting quiz..."
+                    : "Moving to next question..."
+                  : "Select an answer to continue"}
+              </div>
+              {isTransitioning && (
+                <div className="mt-3">
+                  <div className="inline-flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-claret-500"></div>
+                    <span className="text-sm text-claret-600 montserrat-medium">
+                      {currentQuestion === questions.length - 1
+                        ? "Calculating results..."
+                        : "Next question loading..."}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
