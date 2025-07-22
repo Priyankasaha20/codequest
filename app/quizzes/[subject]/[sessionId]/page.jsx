@@ -650,6 +650,7 @@ export default function QuizPage() {
               <div className="text-lg text-onyx-600 mb-6">
                 {Math.round((score / questions.length) * 100)}% Correct
               </div>
+
               <button
                 onClick={handleBackToQuizzes}
                 className="btn-primary montserrat-semibold"
