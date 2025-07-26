@@ -9,7 +9,6 @@ export default function QuizPage() {
   const router = useRouter();
 
   // State management
-  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -38,8 +37,6 @@ export default function QuizPage() {
         const count = parseInt(urlParams.get("count")) || 10;
 
         const sessionData = await quizService.startQuiz(subject, count);
-        console.log("New quiz session started:", sessionData);
-
         setQuizSession(sessionData);
 
         // Redirect to the actual session ID URL
@@ -67,9 +64,7 @@ export default function QuizPage() {
         throw new Error("No active quiz session");
       }
 
-      console.log("Loading question for session:", sessionId);
       const questionData = await quizService.getQuestion(sessionId);
-      console.log("Question data received:", questionData);
 
       setCurrentQuestion(questionData.question);
       setCurrentQuestionIndex(questionData.questionNumber - 1);
@@ -132,7 +127,6 @@ export default function QuizPage() {
         quizSession.quizSessionId,
         answerIndex
       );
-      console.log("Answer submission result:", result);
 
       // Add delay to show selection feedback
       setTimeout(async () => {
