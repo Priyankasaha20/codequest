@@ -33,29 +33,19 @@ export default function QuizPage() {
         setLoading(true);
         setError(null);
 
-        // If sessionId is 'new', start a new quiz session
-        if (sessionId === "new") {
-          console.log("Starting new quiz session for subject:", subject);
+        // Get question count from URL params if provided
+        const urlParams = new URLSearchParams(window.location.search);
+        const count = parseInt(urlParams.get("count")) || 10;
 
-          // Get question count from URL params if provided
-          const urlParams = new URLSearchParams(window.location.search);
-          const count = parseInt(urlParams.get("count")) || 10;
+        const sessionData = await quizService.startQuiz(subject, count);
+        console.log("New quiz session started:", sessionData);
 
-          const sessionData = await quizService.startQuiz(subject, count);
-          console.log("New quiz session started:", sessionData);
+        setQuizSession(sessionData);
 
-          setQuizSession(sessionData);
-
-          // Redirect to the actual session ID URL
-          router.replace(
-            `/quizzes/${subject}/${sessionData.quizSessionId}?count=${count}`
-          );
-        } else {
-          // Load existing quiz session
-          console.log("Loading existing quiz session:", sessionId);
-          setQuizSession({ quizSessionId: sessionId });
-          await loadCurrentQuestion(sessionId);
-        }
+        // Redirect to the actual session ID URL
+        router.replace(
+          `/quizzes/${subject}/${sessionData.quizSessionId}?count=${count}`
+        );
       } catch (error) {
         console.error("Failed to initialize quiz:", error);
         setError(error.message);

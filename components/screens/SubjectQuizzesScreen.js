@@ -22,83 +22,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Mock data for recent quiz attempts
-const recentAttempts = [
-  {
-    id: "attempt_1",
-    subject: "Computer Networks",
-    subjectId: "computer-networks",
-    sessionId: "quiz_computer-networks_1735257266559_abc123",
-    score: 8,
-    totalQuestions: 10,
-    percentage: 80,
-    timeSpent: "12:45",
-    completedAt: "2024-12-20T10:30:00Z",
-    difficulty: "Medium",
-    badge: "Good Performance",
-    improvementAreas: ["Routing Protocols", "Network Security"],
-  },
-  {
-    id: "attempt_2",
-    subject: "Object-Oriented Programming",
-    subjectId: "oop",
-    sessionId: "quiz_oop_1735257266560_def456",
-    score: 18,
-    totalQuestions: 20,
-    percentage: 90,
-    timeSpent: "18:20",
-    completedAt: "2024-12-19T14:15:00Z",
-    difficulty: "Hard",
-    badge: "Excellent",
-    improvementAreas: ["Design Patterns"],
-  },
-  {
-    id: "attempt_3",
-    subject: "Database Management Systems",
-    subjectId: "dbms",
-    sessionId: "quiz_dbms_1735257266561_ghi789",
-    score: 12,
-    totalQuestions: 15,
-    percentage: 80,
-    timeSpent: "20:10",
-    completedAt: "2024-12-18T09:45:00Z",
-    difficulty: "Medium",
-    badge: "Good Performance",
-    improvementAreas: ["Normalization", "Indexing"],
-  },
-  {
-    id: "attempt_4",
-    subject: "Operating Systems",
-    subjectId: "os",
-    sessionId: "quiz_os_1735257266562_jkl012",
-    score: 14,
-    totalQuestions: 20,
-    percentage: 70,
-    timeSpent: "25:30",
-    completedAt: "2024-12-17T16:20:00Z",
-    difficulty: "Hard",
-    badge: "Needs Improvement",
-    improvementAreas: ["Process Management", "Memory Management", "Deadlock"],
-  },
-  {
-    id: "attempt_5",
-    subject: "Computer Networks",
-    subjectId: "computer-networks",
-    sessionId: "quiz_computer-networks_1735257266563_mno345",
-    score: 6,
-    totalQuestions: 10,
-    percentage: 60,
-    timeSpent: "15:20",
-    completedAt: "2024-12-16T11:10:00Z",
-    difficulty: "Easy",
-    badge: "Needs Improvement",
-    improvementAreas: ["OSI Model", "TCP/IP"],
-  },
-];
 
 const subjectQuizzes = [
   {
-    id: "computer-networks",
+    id: "Networking",
     subject: "Computer Networks",
     title: "Computer Networks Quiz",
     description:
@@ -110,7 +37,7 @@ const subjectQuizzes = [
     badge: null,
   },
   {
-    id: "oops",
+    id: "OOPS",
     subject: "Object-Oriented Programming",
     title: "OOP Concepts Quiz",
     description:
@@ -122,7 +49,7 @@ const subjectQuizzes = [
     badge: "OOP Master",
   },
   {
-    id: "os",
+    id: "OS",
     subject: "Operating Systems",
     title: "Operating Systems Quiz",
     description:
@@ -134,7 +61,7 @@ const subjectQuizzes = [
     badge: null,
   },
   {
-    id: "dbms",
+    id: "DBMS",
     subject: "Database Management Systems",
     title: "DBMS Quiz",
     description:
@@ -172,16 +99,6 @@ const SubjectQuizzesScreen = () => {
     setShowModal(true);
   };
 
-  const handleConfirmStart = () => {
-    if (selectedQuiz) {
-      const quizSessionId = `quiz_${
-        selectedQuiz.id
-      }_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      router.push(
-        `/quizzes/${selectedQuiz.id}/${quizSessionId}?count=${questionCount}`
-      );
-    }
-  };
 
   const handleCloseModal = () => {
     setShowModal(false);
