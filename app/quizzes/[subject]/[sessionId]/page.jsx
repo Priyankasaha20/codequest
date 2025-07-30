@@ -2,7 +2,93 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import quizService from "../../../../lib/services/quizService";
+
+// Mock quiz data for demonstration
+const mockQuizData = {
+  Networking: [
+    {
+      id: 1,
+      question: "What does TCP stand for?",
+      options: [
+        "Transmission Control Protocol",
+        "Transfer Control Protocol",
+        "Technical Control Protocol",
+        "Total Control Protocol",
+      ],
+      correct: 0,
+    },
+    {
+      id: 2,
+      question: "Which layer of the OSI model handles routing?",
+      options: [
+        "Physical Layer",
+        "Data Link Layer",
+        "Network Layer",
+        "Transport Layer",
+      ],
+      correct: 2,
+    },
+  ],
+  OOPS: [
+    {
+      id: 1,
+      question: "What is encapsulation in OOP?",
+      options: [
+        "Data hiding",
+        "Code reusability",
+        "Multiple inheritance",
+        "Method overloading",
+      ],
+      correct: 0,
+    },
+    {
+      id: 2,
+      question:
+        "Which concept allows a class to inherit properties from another class?",
+      options: ["Encapsulation", "Polymorphism", "Inheritance", "Abstraction"],
+      correct: 2,
+    },
+  ],
+  OS: [
+    {
+      id: 1,
+      question: "What is a process in operating systems?",
+      options: [
+        "A program in execution",
+        "A stored program",
+        "A system call",
+        "A memory location",
+      ],
+      correct: 0,
+    },
+    {
+      id: 2,
+      question:
+        "Which scheduling algorithm gives the shortest job first priority?",
+      options: ["FCFS", "SJF", "Round Robin", "Priority"],
+      correct: 1,
+    },
+  ],
+  DBMS: [
+    {
+      id: 1,
+      question: "What does ACID stand for in database systems?",
+      options: [
+        "Atomicity, Consistency, Isolation, Durability",
+        "Access, Control, Integrity, Data",
+        "Atomic, Consistent, Independent, Durable",
+        "All, Complete, Individual, Dependent",
+      ],
+      correct: 0,
+    },
+    {
+      id: 2,
+      question: "Which normal form eliminates partial dependency?",
+      options: ["1NF", "2NF", "3NF", "BCNF"],
+      correct: 1,
+    },
+  ],
+};
 
 export default function QuizPage() {
   const params = useParams();
@@ -19,6 +105,7 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quizSession, setQuizSession] = useState(null);
+  const [questions, setQuestions] = useState([]);
 
   const timerRef = useRef(null);
 
@@ -36,13 +123,28 @@ export default function QuizPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const count = parseInt(urlParams.get("count")) || 10;
 
-        const sessionData = await quizService.startQuiz(subject, count);
-        setQuizSession(sessionData);
-
-        // Redirect to the actual session ID URL
-        router.replace(
-          `/quizzes/${subject}/${sessionData.quizSessionId}?count=${count}`
+        // Mock quiz initialization
+        const subjectQuestions = mockQuizData[subject] || [];
+        const limitedQuestions = subjectQuestions.slice(
+          0,
+          Math.min(count, subjectQuestions.length)
         );
+
+        setQuestions(limitedQuestions);
+        setQuizSession({
+          quizSessionId: `mock-session-${Date.now()}`,
+          subject,
+          totalQuestions: limitedQuestions.length,
+          startedAt: new Date().toISOString(),
+        });
+
+        // Load first question
+        if (limitedQuestions.length > 0) {
+          setCurrentQuestion(limitedQuestions[0]);
+          setCurrentQuestionIndex(0);
+        } else {
+          setError(`No questions available for ${subject}`);
+        }
       } catch (error) {
         console.error("Failed to initialize quiz:", error);
         setError(error.message);
@@ -56,39 +158,22 @@ export default function QuizPage() {
     }
   }, [subject, sessionId, router]);
 
-  // Load current question from backend
-  const loadCurrentQuestion = async (currentSessionId) => {
+  // Load current question from local data
+  const loadCurrentQuestion = async (questionIndex = currentQuestionIndex) => {
     try {
-      const sessionId = currentSessionId || quizSession?.quizSessionId;
-      if (!sessionId) {
-        throw new Error("No active quiz session");
-      }
-
-      const questionData = await quizService.getQuestion(sessionId);
-
-      setCurrentQuestion(questionData.question);
-      setCurrentQuestionIndex(questionData.questionNumber - 1);
-
-      // Update quiz session data if available
-      if (questionData.totalQuestions) {
-        setQuizSession((prev) => ({
-          ...prev,
-          totalQuestions: questionData.totalQuestions,
-        }));
-      }
-    } catch (error) {
-      console.error("Failed to load question:", error);
-
-      // If quiz is completed, show results
-      if (
-        error.message.includes("completed") ||
-        error.message.includes("400")
-      ) {
+      if (questionIndex >= questions.length) {
+        // Quiz completed
         setQuizCompleted(true);
         setShowResults(true);
-      } else {
-        setError(error.message);
+        return;
       }
+
+      const questionData = questions[questionIndex];
+      setCurrentQuestion(questionData);
+      setCurrentQuestionIndex(questionIndex);
+    } catch (error) {
+      console.error("Failed to load question:", error);
+      setError(error.message);
     }
   };
 
@@ -122,31 +207,29 @@ export default function QuizPage() {
         [questionId]: answerIndex,
       }));
 
-      // Submit answer to backend
-      const result = await quizService.submitAnswer(
-        quizSession.quizSessionId,
-        answerIndex
-      );
+      // Check if answer is correct
+      const currentQ = questions[currentQuestionIndex];
+      const isCorrect = answerIndex === currentQ.correct;
+
+      if (isCorrect) {
+        setScore((prev) => prev + 1);
+      }
 
       // Add delay to show selection feedback
       setTimeout(async () => {
-        if (result.completed) {
+        const nextIndex = currentQuestionIndex + 1;
+
+        if (nextIndex >= questions.length) {
           // Quiz is completed
           setQuizCompleted(true);
           setShowResults(true);
-
-          // Display final results
-          if (result.finalResults) {
-            setScore(result.finalResults.correctAnswers);
-            // Additional result data can be stored here
-          }
         } else {
           // Load next question
-          await loadCurrentQuestion();
+          await loadCurrentQuestion(nextIndex);
         }
       }, 1200);
     } catch (error) {
-      console.error("Failed to submit answer:", error);
+      console.error("Failed to process answer:", error);
       setError(error.message);
     }
   };
@@ -154,10 +237,14 @@ export default function QuizPage() {
   // Handle time up
   const handleTimeUp = async () => {
     try {
-      if (quizSession?.quizSessionId && currentQuestion) {
-        // Submit null answer for timeout
-        await quizService.submitAnswer(quizSession.quizSessionId, null);
-        await loadCurrentQuestion();
+      // Move to next question on timeout
+      const nextIndex = currentQuestionIndex + 1;
+
+      if (nextIndex >= questions.length) {
+        setQuizCompleted(true);
+        setShowResults(true);
+      } else {
+        await loadCurrentQuestion(nextIndex);
       }
     } catch (error) {
       console.error("Failed to handle timeout:", error);
@@ -168,13 +255,8 @@ export default function QuizPage() {
   // Handle quiz submission
   const handleSubmitQuiz = async () => {
     try {
-      const result = await quizService.completeQuiz(quizSession.quizSessionId);
       setQuizCompleted(true);
       setShowResults(true);
-
-      if (result.finalResults) {
-        setScore(result.finalResults.correctAnswers);
-      }
     } catch (error) {
       console.error("Failed to submit quiz:", error);
       setError(error.message);
@@ -229,7 +311,7 @@ export default function QuizPage() {
 
   // Quiz completed state
   if (quizCompleted && showResults) {
-    const totalQuestions = quizSession?.totalQuestions || 0;
+    const totalQuestions = questions.length;
     const percentage =
       totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
@@ -279,8 +361,7 @@ export default function QuizPage() {
               {subject} Quiz
             </h1>
             <p className="text-onyx-600">
-              Question {currentQuestionIndex + 1} of{" "}
-              {quizSession?.totalQuestions || "..."}
+              Question {currentQuestionIndex + 1} of {questions.length}
             </p>
           </div>
 
@@ -324,9 +405,7 @@ export default function QuizPage() {
             <span className="text-sm text-onyx-600">Progress</span>
             <span className="text-sm text-onyx-600">
               {Math.round(
-                ((currentQuestionIndex + 1) /
-                  (quizSession?.totalQuestions || 1)) *
-                  100
+                ((currentQuestionIndex + 1) / questions.length) * 100
               )}
               %
             </span>
@@ -336,9 +415,7 @@ export default function QuizPage() {
               className="bg-claret-500 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${
-                  ((currentQuestionIndex + 1) /
-                    (quizSession?.totalQuestions || 1)) *
-                  100
+                  ((currentQuestionIndex + 1) / questions.length) * 100
                 }%`,
               }}
             ></div>
@@ -354,7 +431,7 @@ export default function QuizPage() {
             Exit Quiz
           </button>
 
-          {currentQuestionIndex === quizSession?.totalQuestions - 1 && (
+          {currentQuestionIndex === questions.length - 1 && (
             <button
               onClick={handleSubmitQuiz}
               className="px-6 py-2 bg-claret-500 text-white rounded-lg hover:bg-claret-600 transition-colors montserrat-medium"
