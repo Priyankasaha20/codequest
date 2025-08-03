@@ -22,14 +22,14 @@ const Sidebar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
   const getRouteFromId = (id) => {
     const routeMap = {
       dashboard: "/dashboard",
-      practice: "/practice-hub",
-      daily: "/daily-challenge",
-      quizzes: "/quizzes",
-      companies: "/company-prep",
-      ai_coach: "/ai-coach",
-      multiplayer: "/multiplayer",
-      analytics: "/analytics",
-      profile: "/profile",
+      practice: "/dashboard/practice-hub",
+      daily: "/dashboard/daily-challenge",
+      quizzes: "/dashboard/quizzes",
+      companies: "/dashboard/company-prep",
+      ai_coach: "/dashboard/ai-coach",
+      multiplayer: "/dashboard/multiplayer",
+      analytics: "/dashboard/analytics",
+      profile: "/dashboard/profile",
     };
     return routeMap[id] || `/${id}`;
   };

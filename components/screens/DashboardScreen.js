@@ -10,23 +10,16 @@ import {
   Play,
   Activity,
 } from "lucide-react";
-import { AuthContext } from "../../contexts/AuthContext";
 
 const DashboardScreen = () => {
   const router = useRouter();
-  const { user, isLoading } = useContext(AuthContext);
 
-  // While user data is loading
-  if (isLoading || !user) {
-    return (
-      <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-claret-500"></div>
-      </div>
-    );
-  }
-
-  const userData = user.user;
-
+  const userData = {
+    name: "John Doe",
+    email: "test@mail",
+    createdAt: "2023-01-01T00:00:00Z",
+    emailVerified: true,
+  };
   return (
     <div className="min-h-screen bg-gradient-background p-6">
       <div className="mb-8">

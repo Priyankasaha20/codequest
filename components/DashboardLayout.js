@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
 import { navigation } from "../utils/navigationData";
 
 const AuthenticatedLayout = ({ children }) => {
