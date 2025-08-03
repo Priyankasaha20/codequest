@@ -1,5 +1,5 @@
 import React from "react";
-import AuthenticatedLayout from "../../components/AuthenticatedLayout";
+import AuthenticatedLayout from "../../../components/AuthenticatedLayout";
 
 export default function CompaniesPage() {
   return (
