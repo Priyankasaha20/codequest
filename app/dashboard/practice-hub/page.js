@@ -1,11 +1,6 @@
 import React from "react";
-import PracticeHubScreen from "../../components/screens/PracticeHubScreen";
-import AuthenticatedLayout from "../../components/AuthenticatedLayout";
+import PracticeHubScreen from "../../../components/screens/PracticeHubScreen";
 
 export default function PracticeHubPage() {
-  return (
-    <AuthenticatedLayout>
-      <PracticeHubScreen />
-    </AuthenticatedLayout>
-  );
+  return <PracticeHubScreen />;
 }

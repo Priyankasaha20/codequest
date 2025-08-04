@@ -1,16 +1,11 @@
 import React from "react";
 import { cookies } from "next/headers";
-import AuthenticatedLayout from "../../components/AuthenticatedLayout";
 import ProfileScreen from "@/components/screens/ProfileScreen";
 
 export default async function ProfilePage() {
   const profileData = await fetchProfileData();
 
-  return (
-    <AuthenticatedLayout>
-      <ProfileScreen profileData={profileData} />
-    </AuthenticatedLayout>
-  );
+  return <ProfileScreen profileData={profileData} />;
 }
 
 async function fetchProfileData() {
