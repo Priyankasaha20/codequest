@@ -1,17 +1,18 @@
 import React from "react";
-import DashboardScreen from "../../components/screens/DashboardScreen";
+import { cookies } from "next/headers";
+import DashboardScreen from "@/components/screens/DashboardScreen";
 
 export default async function DashboardPage() {
-  return <DashboardScreen />;
+  const usersData = await fetchProfileData();
+  return <DashboardScreen usersData={usersData} />;
 }
-
+// Data fetching
 async function fetchProfileData() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("connect.sid")?.value;
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/me`,
+    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/profile`,
     {
-      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         ...(sessionId ? { Cookie: `connect.sid=${sessionId}` } : {}),

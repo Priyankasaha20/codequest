@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -11,27 +11,18 @@ import {
   Activity,
 } from "lucide-react";
 
-const DashboardScreen = () => {
-  const router = useRouter();
-
-  const userData = {
-    name: "John Doe",
-    email: "test@mail",
-    createdAt: "2023-01-01T00:00:00Z",
-    emailVerified: true,
-  };
+const DashboardScreen = ({ usersData }) => {
   return (
     <div className="min-h-screen bg-gradient-background p-6">
       <div className="mb-8">
         <h1 className="text-3xl montserrat-bold text-onyx-700 mb-2">
-          Welcome back, {userData.name}!
+          Welcome back, {usersData.name}!
         </h1>
         <div className="text-sm text-onyx-600 space-y-1">
-          <div>Email: {userData.email}</div>
+          <div>Email: {usersData.email}</div>
           <div>
-            Member since: {new Date(userData.createdAt).toLocaleDateString()}
+            Member since: {new Date(usersData.createdAt).toLocaleDateString()}
           </div>
-          <div>Email verified: {userData.emailVerified ? "Yes" : "No"}</div>
           <div>Today: {new Date().toLocaleDateString()}</div>
         </div>
       </div>

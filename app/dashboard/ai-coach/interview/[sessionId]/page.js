@@ -435,13 +435,11 @@ const InterviewSessionPage = () => {
     );
   }
 
-  // Make sure session is defined before accessing its properties
   const currentQuestion = session?.questions?.[currentQuestionIndex];
 
   return (
     <div className="min-h-screen bg-gradient-background p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="card mb-6">
           <div className="card-content">
             <div className="flex items-center justify-between">
@@ -461,8 +459,6 @@ const InterviewSessionPage = () => {
                 </span>
               </div>
             </div>
-
-            {/* Progress Bar */}
             <div className="mt-4">
               <div className="w-full bg-alabaster-200 rounded-full h-2">
                 <div
@@ -481,7 +477,6 @@ const InterviewSessionPage = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Video Section */}
           <div className="card">
             <div className="card-content">
               <div className="flex items-center justify-between mb-4">
@@ -510,7 +505,7 @@ const InterviewSessionPage = () => {
                 {isVideoEnabled ? (
                   <Webcam
                     ref={webcamRef}
-                    audio={false} // We're handling audio separately
+                    audio={false}
                     videoConstraints={videoConstraints}
                     className="w-full h-auto rounded-lg"
                   />
@@ -522,7 +517,6 @@ const InterviewSessionPage = () => {
                     </p>
                   </div>
                 )}
-                {/* Recording indicator */}
                 {isRecording && (
                   <div className="absolute top-4 left-4 flex items-center space-x-2 bg-red-500 text-white px-3 py-1 rounded-full">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
