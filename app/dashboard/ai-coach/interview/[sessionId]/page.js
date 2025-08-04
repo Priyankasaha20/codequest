@@ -3,18 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
-import Webcam from "react-webcam"; // Import the react-webcam library
+import Webcam from "react-webcam";
 import {
-  Mic,
-  MicOff,
   Video,
   VideoOff,
-  Play,
-  Square,
-  ArrowRight,
   CheckCircle,
   Camera,
   AlertCircle,
@@ -55,20 +47,8 @@ const InterviewSessionPage = () => {
     facingMode: "user",
   };
 
-  // Speech recognition hook from react-speech-recognition
-  const {
-    transcript,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-    isMicrophoneAvailable,
-    listening,
-  } = useSpeechRecognition();
-
-  // Check if we're on the client side
   useEffect(() => {
     setIsMounted(true);
-
-    // Debug: Check if SpeechRecognition is available
     console.log(
       "SpeechRecognition supported?",
       window.SpeechRecognition || window.webkitSpeechRecognition
@@ -77,13 +57,13 @@ const InterviewSessionPage = () => {
     console.log("Is HTTPS?", window.location.protocol === "https:");
   }, []);
 
-  // Safely check browser features - only on client side
+
   const safelyCheckBrowserFeatures = () => {
-    if (!isMounted) return true; // Return true during SSR to prevent hydration mismatch
+    if (!isMounted) return true; 
     return browserSupportsSpeechRecognition;
   };
 
-  // Fetch session data
+
   useEffect(() => {
     const fetchSession = async () => {
       if (!sessionId) return;
@@ -104,66 +84,6 @@ const InterviewSessionPage = () => {
     }
   }, [sessionId, isMounted]);
 
-  // Initialize speech recognition and check microphone permissions
-  useEffect(() => {
-    if (!isMounted) return;
-
-    const initializeSpeechRecognition = async () => {
-      try {
-        // Initialize speech recognition
-        if (browserSupportsSpeechRecognition) {
-          console.log("Speech recognition is supported");
-
-          // Set up event handlers for speech recognition
-          SpeechRecognition.onError = (event) => {
-            console.error("Speech recognition error:", event);
-            if (event.error === "not-allowed") {
-              alert(
-                "Microphone access denied. Please allow microphone access and try again."
-              );
-              setIsRecording(false);
-            } else if (event.error === "no-speech") {
-              console.log("No speech detected, continuing...");
-            } else if (event.error === "network") {
-              alert(
-                "Network error occurred. Please check your connection and try again."
-              );
-              setIsRecording(false);
-            }
-          };
-
-          SpeechRecognition.onEnd = () => {
-            console.log("Speech recognition ended");
-            if (isRecording) {
-              // If we're supposed to be recording but recognition ended, restart it
-              console.log("Restarting speech recognition...");
-              SpeechRecognition.startListening({
-                continuous: true,
-                language: "en-US",
-                interimResults: true,
-              });
-            }
-          };
-
-          SpeechRecognition.onStart = () => {
-            console.log("Speech recognition started");
-          };
-
-          SpeechRecognition.onResult = (event) => {
-            console.log("Speech recognition result:", event.results);
-          };
-        } else {
-          console.warn("Speech recognition not supported in this browser");
-        }
-      } catch (error) {
-        console.error("Error initializing speech recognition:", error);
-      }
-    };
-
-    initializeSpeechRecognition();
-  }, [isMounted, browserSupportsSpeechRecognition, isRecording]);
-
-  // Request media permissions - only on client-side
   useEffect(() => {
     if (!isMounted) return;
 
@@ -175,17 +95,13 @@ const InterviewSessionPage = () => {
           audio: true,
         });
 
-        // Store the stream reference for later use (e.g., to enable/disable tracks)
         streamRef.current = stream;
         setPermissionStatus({ video: "granted", audio: "granted" });
         console.log("Media permissions granted!");
 
-        // With react-webcam, we don't need to set the srcObject manually
-        // The Webcam component handles this for us
       } catch (error) {
         console.error("Media permissions error:", error);
 
-        // Try audio only if video+audio failed
         try {
           const audioStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
@@ -202,7 +118,6 @@ const InterviewSessionPage = () => {
 
     requestPermissions();
 
-    // Cleanup function to stop media streams when component unmounts
     return () => {
       if (streamRef.current) {
         const tracks = streamRef.current.getTracks();
@@ -212,7 +127,6 @@ const InterviewSessionPage = () => {
     };
   }, [isMounted]);
 
-  // Check browser support
   if (isMounted && !safelyCheckBrowserFeatures()) {
     return (
       <div className="min-h-screen bg-gradient-background p-6 flex items-center justify-center">
@@ -238,13 +152,9 @@ const InterviewSessionPage = () => {
     );
   }
 
-  // Toggle video on/off
   const toggleVideo = () => {
     if (streamRef.current) {
-      // Get video tracks
       const videoTracks = streamRef.current.getVideoTracks();
-
-      // Toggle enabled state for all video tracks
       videoTracks.forEach((track) => {
         track.enabled = !isVideoEnabled;
       });
@@ -255,33 +165,9 @@ const InterviewSessionPage = () => {
 
   const startRecording = async () => {
     console.log("Starting recording...");
-    console.log("Microphone available:", isMicrophoneAvailable);
-    console.log(
-      "Browser supports speech recognition:",
-      browserSupportsSpeechRecognition
-    );
-    console.log("Permission status:", permissionStatus);
-
-    if (!browserSupportsSpeechRecognition) {
-      alert(
-        "Your browser doesn't support speech recognition. Please use Chrome, Edge, or Safari."
-      );
-      return;
-    }
-
-    // Request microphone permission explicitly for speech recognition
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Test that we can access the microphone
-      console.log("Microphone access confirmed for speech recognition");
-
-      // We can stop this test stream since SpeechRecognition will handle its own
       stream.getTracks().forEach((track) => track.stop());
-
-      resetTranscript();
-
-      // Start speech recognition with proper error handling
       SpeechRecognition.startListening({
         continuous: true,
         language: "en-US",
@@ -302,12 +188,9 @@ const InterviewSessionPage = () => {
 
   const stopRecording = async () => {
     console.log("Stopping recording...");
-    console.log("Current transcript:", transcript);
 
     SpeechRecognition.stopListening();
     setIsRecording(false);
-
-    // Check if we have any transcript content
     if (!transcript || transcript.trim() === "") {
       alert("No speech was detected. Please try speaking again.");
       return;
@@ -323,7 +206,6 @@ const InterviewSessionPage = () => {
         text: transcript,
       });
 
-      // Store answer locally
       const newAnswer = {
         questionIndex: currentQuestionIndex,
         question: session?.questions?.[currentQuestionIndex] || "",
@@ -331,7 +213,6 @@ const InterviewSessionPage = () => {
       };
       setAnswers((prev) => [...prev, newAnswer]);
 
-      // Move to next question or complete
       if (
         session?.questions &&
         currentQuestionIndex < session.questions.length - 1
@@ -339,7 +220,6 @@ const InterviewSessionPage = () => {
         setCurrentQuestionIndex((prev) => prev + 1);
         resetTranscript();
       } else {
-        // Complete interview
         await completeInterview();
       }
     } catch (error) {
@@ -357,8 +237,6 @@ const InterviewSessionPage = () => {
       );
       setResults(data);
       setInterviewComplete(true);
-
-      // Stop media streams
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
@@ -664,10 +542,7 @@ const InterviewSessionPage = () => {
               </div>
             </div>
           </div>
-
-          {/* Question and Controls */}
           <div className="space-y-6">
-            {/* Current Question */}
             <div className="card">
               <div className="card-content">
                 <h2 className="text-lg montserrat-semibold text-onyx-500 mb-4">
@@ -682,101 +557,12 @@ const InterviewSessionPage = () => {
                 )}
               </div>
             </div>
-
-            {/* Recording Controls */}
             <div className="card">
               <div className="card-content">
                 <h3 className="text-lg montserrat-semibold text-onyx-500 mb-4">
                   Your Response
                 </h3>
-
-                {/* Live Transcript */}
-                <div className="bg-alabaster-50 border rounded-lg p-4 min-h-[120px] mb-4">
-                  <h4 className="text-sm montserrat-semibold text-onyx-600 mb-2">
-                    Live Transcript:
-                  </h4>
-                  <p className="text-onyx-700 mb-2">
-                    {transcript ||
-                      (listening
-                        ? "Listening..."
-                        : 'Click "Start Recording" to begin speaking')}
-                  </p>
-
-                  {/* Debug Info */}
-                  <div className="text-xs text-gray-500 mt-2 border-t pt-2">
-                    <p>
-                      Debug: Listening: {listening ? "Yes" : "No"} | Recording:{" "}
-                      {isRecording ? "Yes" : "No"}
-                    </p>
-                    <p>
-                      Speech Recognition Supported:{" "}
-                      {browserSupportsSpeechRecognition ? "Yes" : "No"}
-                    </p>
-                    <p>
-                      Microphone Available:{" "}
-                      {isMicrophoneAvailable ? "Yes" : "No"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Controls */}
-                <div className="flex space-x-4">
-                  {!isRecording ? (
-                    <button
-                      onClick={startRecording}
-                      disabled={permissionStatus.audio !== "granted"}
-                      className="flex-1 bg-claret-500 hover:bg-claret-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg montserrat-semibold transition-colors flex items-center justify-center space-x-2"
-                    >
-                      <Mic className="w-5 h-5" />
-                      <span>Start Recording</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={stopRecording}
-                      disabled={isSubmitting}
-                      className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg montserrat-semibold transition-colors flex items-center justify-center space-x-2"
-                    >
-                      <Square className="w-5 h-5" />
-                      <span>
-                        {isSubmitting ? "Submitting..." : "Stop & Submit"}
-                      </span>
-                    </button>
-                  )}
-                </div>
-
-                <div className="mt-4 flex items-center justify-between text-sm text-onyx-600">
-                  <div className="flex items-center space-x-2">
-                    <Mic
-                      className={`w-4 h-4 ${
-                        permissionStatus.audio === "granted"
-                          ? "text-tea-green-500"
-                          : "text-red-500"
-                      }`}
-                    />
-                    <span>
-                      Microphone:{" "}
-                      {permissionStatus.audio === "granted"
-                        ? "Ready"
-                        : "Not Available"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        browserSupportsSpeechRecognition
-                          ? "bg-green-500"
-                          : "bg-red-500"
-                      }`}
-                    ></div>
-                    <span className="text-xs">
-                      Speech Recognition:{" "}
-                      {browserSupportsSpeechRecognition
-                        ? "Supported"
-                        : "Not Supported"}
-                    </span>
-                  </div>
-                </div>
+                <p className="text-onyx-700">Response recording is disabled.</p>
               </div>
             </div>
           </div>
