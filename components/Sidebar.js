@@ -33,11 +33,13 @@ const Sidebar = ({ navigation, sidebarOpen, setSidebarOpen }) => {
     };
     return routeMap[id] || `/${id}`;
   };
-
   const isCurrentRoute = (id) => {
-    const route = getRouteFromId(id);
-    return pathname === route || pathname.startsWith(route + "/");
-  };
+    const route = getRouteFromId(id)
+    if (id === "dashboard") {
+      return pathname === route
+    }
+    return pathname === route || pathname.startsWith(`${route}/`)
+  }
 
   // Group navigation items
   const mainNavigation = navigation.slice(0, 6); // Main features
